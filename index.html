@@ -1,0 +1,619 @@
+<antArtifact identifier="storypoint-poker-firebase" type="application/vnd.ant.code" language="html" title="Story Point Poker Game - Multi PC">
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Point Poker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .session-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .session-id {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 18px;
+            margin: 5px 0;
+            user-select: all;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-section label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .input-section input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+
+        .input-group button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .input-group button:hover {
+            background: #5568d3;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            aspect-ratio: 2/3;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .card.selected {
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn {
+            background: #4caf50;
+            color: white;
+        }
+
+        .submit-btn:hover {
+            background: #45a049;
+        }
+
+        .reveal-btn {
+            background: #ff9800;
+            color: white;
+        }
+
+        .reveal-btn:hover {
+            background: #e68900;
+        }
+
+        .reset-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background: #da190b;
+        }
+
+        .votes {
+            margin-top: 30px;
+        }
+
+        .votes h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .vote-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .vote-item {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .vote-item.revealed {
+            background: #e8f5e9;
+        }
+
+        .vote-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .vote-value.hidden {
+            color: #999;
+        }
+
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .connection-status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .connection-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 12px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-status" id="connectionStatus">Verbinden...</div>
+
+    <div class="container">
+        <h1>🃏 Story Point Poker</h1>
+        
+        <div class="session-info">
+            <div>Deel deze sessie code met je teamleden:</div>
+            <div class="session-id" id="sessionId">-</div>
+            <div style="font-size: 12px; margin-top: 5px;">Of join een bestaande sessie hieronder</div>
+        </div>
+
+        <div class="input-section">
+            <label for="sessionInput">Sessie Code (optioneel - om een bestaande sessie te joinen):</label>
+            <div class="input-group">
+                <input type="text" id="sessionInput" placeholder="Bijv: POKER-1234">
+                <button onclick="joinSession()">Join Sessie</button>
+            </div>
+        </div>
+
+        <div id="status" class="status" style="display: none;"></div>
+
+        <div class="input-section">
+            <label for="playerName">Jouw naam:</label>
+            <input type="text" id="playerName" placeholder="Voer je naam in...">
+        </div>
+
+        <div class="cards" id="cards"></div>
+
+        <div class="buttons">
+            <button class="submit-btn" onclick="submitVote()">Stem Indienen</button>
+            <button class="reveal-btn" onclick="revealVotes()">Reveal Alle Stemmen</button>
+            <button class="reset-btn" onclick="resetGame()">Nieuwe Ronde</button>
+        </div>
+
+        <div class="votes">
+            <h2>Team Stemmen: <span id="voteCount">0</span></h2>
+            <div id="voteList" class="vote-list"></div>
+        </div>
+
+        <div class="statistics" id="statistics" style="display: none;">
+            <div class="stat-box">
+                <div class="stat-label">Gemiddelde</div>
+                <div class="stat-value" id="averageValue">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Meest Gekozen</div>
+                <div class="stat-value" id="modeValue">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Laagste</div>
+                <div class="stat-value" id="minValue">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Hoogste</div>
+                <div class="stat-value" id="maxValue">-</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase configuratie
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, onValue, update, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // Firebase config - VERVANG DIT MET JOUW EIGEN FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyAxOQDA3_XbMhXDa-nks703O5uC9jPM01M",
+  authDomain: "cpi-poker.firebaseapp.com",
+  databaseURL: "https://cpi-poker-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "cpi-poker",
+  storageBucket: "cpi-poker.firebasestorage.app",
+  messagingSenderId: "934610503782",
+  appId: "1:934610503782:web:1174a6d1b0b6f166b445a7"
+};
+ 
+        // Initialize Firebase
+        let app, database, currentSessionRef;
+        let isConnected = false;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            database = getDatabase(app);
+            updateConnectionStatus(true);
+        } catch (error) {
+            console.error("Firebase initialisatie mislukt:", error);
+            updateConnectionStatus(false);
+            showStatus('Let op: Deze demo werkt alleen met een geldige Firebase configuratie. Zie instructies hieronder.', 'error');
+        }
+
+        const storyPoints = ['0', '½', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', '☕'];
+        let selectedCard = null;
+        let currentSession = generateSessionId();
+
+        function generateSessionId() {
+            return 'POKER-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        }
+
+        function updateConnectionStatus(connected) {
+            isConnected = connected;
+            const statusEl = document.getElementById('connectionStatus');
+            if (connected) {
+                statusEl.textContent = '● Verbonden';
+                statusEl.className = 'connection-status connected';
+            } else {
+                statusEl.textContent = '● Niet Verbonden';
+                statusEl.className = 'connection-status disconnected';
+            }
+        }
+
+        window.joinSession = function() {
+            const sessionInput = document.getElementById('sessionInput').value.trim().toUpperCase();
+            if (sessionInput) {
+                currentSession = sessionInput;
+                document.getElementById('sessionId').textContent = currentSession;
+                initializeSession();
+                showStatus(`Gejoined met sessie: ${currentSession}`, 'success');
+            }
+        }
+
+        function initializeSession() {
+            if (!database) return;
+            
+            document.getElementById('sessionId').textContent = currentSession;
+            currentSessionRef = ref(database, 'sessions/' + currentSession);
+            
+            // Luister naar veranderingen in de sessie
+            onValue(currentSessionRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    updateVoteList(data.votes || {}, data.revealed || false);
+                    calculateStatistics(data.votes || {}, data.revealed || false);
+                } else {
+                    updateVoteList({}, false);
+                }
+            });
+        }
+
+        function initCards() {
+            const cardsContainer = document.getElementById('cards');
+            cardsContainer.innerHTML = '';
+            
+            storyPoints.forEach(point => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.textContent = point;
+                card.onclick = () => selectCard(point, card);
+                cardsContainer.appendChild(card);
+            });
+        }
+
+        function selectCard(value, element) {
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            element.classList.add('selected');
+            selectedCard = value;
+        }
+
+        window.submitVote = async function() {
+            if (!database) {
+                showStatus('Firebase niet geconfigureerd. Zie instructies.', 'error');
+                return;
+            }
+
+            const playerName = document.getElementById('playerName').value.trim();
+            
+            if (!playerName) {
+                showStatus('Voer eerst je naam in!', 'info');
+                return;
+            }
+            
+            if (!selectedCard) {
+                showStatus('Selecteer eerst een kaart!', 'info');
+                return;
+            }
+
+            try {
+                const voteRef = ref(database, `sessions/${currentSession}/votes/${playerName}`);
+                await set(voteRef, selectedCard);
+                showStatus(`Stem van ${playerName} (${selectedCard}) is ingediend!`, 'success');
+            } catch (error) {
+                showStatus('Fout bij indienen stem: ' + error.message, 'error');
+            }
+        }
+
+        window.revealVotes = async function() {
+            if (!database) {
+                showStatus('Firebase niet geconfigureerd.', 'error');
+                return;
+            }
+
+            try {
+                const revealRef = ref(database, `sessions/${currentSession}/revealed`);
+                await set(revealRef, true);
+                showStatus('Alle stemmen zijn nu zichtbaar!', 'success');
+            } catch (error) {
+                showStatus('Fout bij revealen: ' + error.message, 'error');
+            }
+        }
+
+        window.resetGame = async function() {
+            if (!database) {
+                showStatus('Firebase niet geconfigureerd.', 'error');
+                return;
+            }
+
+            try {
+                await set(currentSessionRef, {
+                    votes: {},
+                    revealed: false
+                });
+                
+                selectedCard = null;
+                document.querySelectorAll('.card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                showStatus('Nieuwe ronde gestart!', 'info');
+            } catch (error) {
+                showStatus('Fout bij resetten: ' + error.message, 'error');
+            }
+        }
+
+        function updateVoteList(votes, revealed) {
+            const voteList = document.getElementById('voteList');
+            const voteCount = document.getElementById('voteCount');
+            voteList.innerHTML = '';
+
+            const voteEntries = Object.entries(votes);
+            voteCount.textContent = voteEntries.length;
+            
+            if (voteEntries.length === 0) {
+                voteList.innerHTML = '<div class="vote-item">Nog geen stemmen...</div>';
+                return;
+            }
+
+            voteEntries.forEach(([name, value]) => {
+                const voteItem = document.createElement('div');
+                voteItem.className = `vote-item ${revealed ? 'revealed' : ''}`;
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = name;
+                
+                const valueSpan = document.createElement('span');
+                valueSpan.className = `vote-value ${revealed ? '' : 'hidden'}`;
+                valueSpan.textContent = revealed ? value : '🃏';
+                
+                voteItem.appendChild(nameSpan);
+                voteItem.appendChild(valueSpan);
+                voteList.appendChild(voteItem);
+            });
+        }
+
+        function calculateStatistics(votes, revealed) {
+            const statsDiv = document.getElementById('statistics');
+            
+            if (!revealed || Object.keys(votes).length === 0) {
+                statsDiv.style.display = 'none';
+                return;
+            }
+
+            statsDiv.style.display = 'grid';
+
+            const numericVotes = Object.values(votes)
+                .map(v => v === '½' ? 0.5 : parseFloat(v))
+                .filter(v => !isNaN(v));
+
+            if (numericVotes.length === 0) {
+                document.getElementById('averageValue').textContent = '-';
+                document.getElementById('minValue').textContent = '-';
+                document.getElementById('maxValue').textContent = '-';
+                return;
+            }
+
+            // Gemiddelde
+            const avg = numericVotes.reduce((a, b) => a + b, 0) / numericVotes.length;
+            document.getElementById('averageValue').textContent = avg.toFixed(1);
+
+            // Min en Max
+            document.getElementById('minValue').textContent = Math.min(...numericVotes);
+            document.getElementById('maxValue').textContent = Math.max(...numericVotes);
+
+            // Meest gekozen (mode)
+            const allVotes = Object.values(votes);
+            const frequency = {};
+            allVotes.forEach(v => frequency[v] = (frequency[v] || 0) + 1);
+            const mode = Object.keys(frequency).reduce((a, b) => frequency[a] > frequency[b] ? a : b);
+            document.getElementById('modeValue').textContent = mode;
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
+        }
+
+        // Initialize
+        initCards();
+        if (database) {
+            initializeSession();
+        } else {
+            // Toon instructies als Firebase niet werkt
+            showStatus('⚠️ Firebase Setup Vereist - Zie instructies hieronder', 'error');
+            document.querySelector('.container').innerHTML += `
+                <div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 12px; border: 2px solid #ffc107;">
+                    <h3 style="color: #856404; margin-bottom: 15px;">📋 Firebase Setup Instructies:</h3>
+                    <ol style="color: #856404; line-height: 1.8; padding-left: 20px;">
+                        <li>Ga naar <a href="https://console.firebase.google.com" target="_blank">Firebase Console</a></li>
+                        <li>Maak een nieuw project aan (gratis)</li>
+                        <li>Klik op "Realtime Database" in het menu</li>
+                        <li>Klik op "Create Database" en kies "Start in test mode"</li>
+                        <li>Ga naar Project Settings (⚙️ icoon) > scroll naar beneden</li>
+                        <li>Kopieer de Firebase config object</li>
+                        <li>Vervang de <code>firebaseConfig</code> variabele in de code met jouw eigen config</li>
+                        <li>Klaar! De app werkt nu real-time tussen alle computers</li>
+                    </ol>
+                    <p style="margin-top: 15px; color: #856404;"><strong>💡 Tip:</strong> Firebase heeft een gratis tier die perfect is voor dit soort applicaties!</p>
+                </div>
+            ` + document.querySelector('.container').innerHTML;
+        }
+    </script>
+</body>
+</html>
+</antArtifact>
